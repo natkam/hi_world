@@ -5,32 +5,23 @@ f2 = open('tlumaczenie.txt', 'w')
 nr_a = ord('a')
 nr_z = ord('z')
 ile_liter = nr_z - nr_a + 1
-#print(nr_a, nr_z, ileznakow)
 nr_A = ord('A')
 nr_Z = ord('Z')
 
-
-N = 2  ### przesuniecie; widze, ze jest 2, ale mozna by szukac jakas petla; ja to znalazlam tak:
-
-# for N in range(1, 26):
-    # print(chr( ord('V') - N ), chr( ord('j') - N ), chr( ord('g') - N ))
-    # print(N)
-
+przesuniecie = 2
+# widze, ze jest 2, ale mozna by szukac jakas petla; ja to znalazlam tak:
+# for przesuniecie in range(1, 26):
+    # print(chr(ord('V') - przesuniecie), chr(ord('j') - przesuniecie), chr(ord('g') - przesuniecie))
+    # print(przesuniecie)
 
 znak = 'c'
-#print('znak = ', c)
-
 
 while znak:
-    znak = f1.read(1) ###czyta po 1 znaku z pliku f1
-    #print('znak = ', znak)
+    znak = f1.read(1) # czyta po 1 znaku z pliku f1
     if znak.isalpha():
         nr_znaku = ord(znak)
-        
-        if (znak.islower() and (nr_znaku - N) < nr_a) or (znak.isupper() and (nr_znaku - N) < nr_A) :
-            znak = chr(nr_znaku - N + 26)
+        if (znak.islower() and (nr_znaku - przesuniecie) < nr_a) or (znak.isupper() and (nr_znaku - przesuniecie) < nr_A):
+            znak = chr(nr_znaku - przesuniecie + 26)
         else:
-            znak = chr(nr_znaku - N)
+            znak = chr(nr_znaku - przesuniecie)
     f2.write(znak)
-
-
