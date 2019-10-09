@@ -1,4 +1,4 @@
 # hi_world
 Exercises, and possibly more.
 
-we all know major Tom's a junkie
+The more recent code formatted with [black](https://github.com/psf/black).
