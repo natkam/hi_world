@@ -11,8 +11,7 @@ def find_legit_numbers(s: str) -> typing.List[str]:
 
 
 def check_if_cubic(n: str) -> bool:
-    if sum(map(lambda n: n ** 3, map(int, n))) == int(n):
-        # the above is not the most readable solution, agreed xp
+    if sum(map(lambda n: int(n) ** 3, n)) == int(n):
         return True
     else:
         return False
@@ -20,10 +19,9 @@ def check_if_cubic(n: str) -> bool:
 
 def is_sum_of_cubes(s: str) -> str:
     numbers = find_legit_numbers(s)
-    if numbers:
-        cubics = [number for number in numbers if check_if_cubic(number)]
-        if cubics:
-            return f'{" ".join(cubics)} {sum(map(int, cubics))} Lucky'
+    cubics = list(filter(check_if_cubic, numbers))
+    if cubics:
+        return f'{" ".join(cubics)} {sum(map(int, cubics))} Lucky'
     return "Unlucky"
 
 
