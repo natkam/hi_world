@@ -88,7 +88,7 @@ def square_sums(N: int = 43):
 #     #     # Solutions are symmetrical, so let's arbitrarily choose a starting number:
 #     #     solution[0] = edge_numbers[0]
 #     #     solution[1] = pairs[solution[0]][0]
-#     #     # ...while the other one goes at the end of the solution:
+#     #     # ...while the other one goes at the end of the solution (if it exists!!!):
 #     #     solution[-1] = edge_numbers[1]
 #     #     solution[-2] = pairs[solution[-1]][0]
 #     # else:
@@ -125,6 +125,7 @@ def square_sums(N: int = 43):
 def solution_is_correct(number: int, solution: Union[List[int], bool]) -> bool:
     if not solution:
         print(
+            f"[N = {number}] No solution found.\n"
             f"[N = {number}] WARNING: It's impossible to easily verify that a solution "
             f"does not exist!"
         )
@@ -141,13 +142,21 @@ def solution_is_correct(number: int, solution: Union[List[int], bool]) -> bool:
 
 
 if __name__ == "__main__":
-    # assert solution_is_correct(15, [9, 7, 2, 14, 11, 5, 4, 12, 13, 3, 6, 10, 15, 1, 8])
-    # assert solution_is_correct(15, square_sums(15))
+    for N in range(5, 15):
+        assert square_sums(N) is False
 
-    for N in range(5, 16):
+    for N in range(15, 18):
+        # N = 15, solution = [8, 1, 15, 10, 6, 3, 13, 12, 4, 5, 11, 14, 2, 7, 9]
+        # N = 16, solution = [8, 1, 15, 10, 6, 3, 13, 12, 4, 5, 11, 14, 2, 7, 9, 16]
+        # N = 17, solution = [16, 9, 7, 2, 14, 11, 5, 4, 12, 13, 3, 6, 10, 15, 1, 8, 17]
         assert solution_is_correct(N, square_sums(N))
 
-    assert solution_is_correct(18, square_sums(18))  # no solution
+    for N in set(range(18 - 25)) - {23}:
+        assert square_sums(N) is False  # no solution
+
+    # N = 23, solution = [2, 23, 13, 12, 4, 21, 15, 10, 6, 19, 17, 8, 1, 3, 22, 14, 11,
+    #   5, 20, 16, 9, 7, 18]
+    assert solution_is_correct(23, square_sums(23))
     # N = 30, solution = [1, 24, 25, 11, 5, 4, 12, 13, 3, 6, 30, 19, 17, 8, 28, 21, 15,
     #   10, 26, 23, 2, 14, 22, 27, 9, 16, 20, 29, 7, 18]
     assert solution_is_correct(30, square_sums(30))
@@ -159,4 +168,4 @@ if __name__ == "__main__":
     # N = 37, solution = [1, 3, 13, 36, 28, 8, 17, 32, 4, 21, 15, 34, 30, 19, 6, 10, 26,
     #     23, 2, 7, 18, 31, 33, 16, 9, 27, 22, 14, 35, 29, 20, 5, 11, 25, 24, 12, 37]
     assert solution_is_correct(37, square_sums(37))
-    print(time.perf_counter() - start)  # 1.3896432460023789
+    print(time.perf_counter() - start)  # ~ 0.77-1.4...
