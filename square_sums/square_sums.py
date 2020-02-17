@@ -27,6 +27,7 @@ def naive_square_sums(N: int = 43):
 
 def prepare_pairs(available_squares: List[int], N: int) -> Dict[int, List[int]]:
     """ For each number in the input, get a list of available complementary numbers. """
+    # TODO: memoization? For bigger N, more options can be added. Would it make sense?
     pairs = {}
     for n in range(1, N + 1):
         pairs[n] = [
@@ -39,7 +40,7 @@ def solve(n, pairs, solution, N):
     candidates = [c for c in pairs[n] if c not in solution]
 
     if not candidates:
-        if len(solution) == N - 1:
+        if len(solution) == N - 1:  # all candidates already used
             solution.append(n)
             return solution
         return False
@@ -66,60 +67,31 @@ def square_sums(N: int = 43):
     if any(len(val) == 0 for val in pairs.values()):
         return False
 
-    for number in pairs:
+    ### This trick only helps with small N's, apparently there's no edge numbers for N>30 :(
+    # If a number only has one complementary number, it has to be at the beginning or end
+    # of the returned sequence. Hence, there cannot be more than two such numbers:
+    edge_numbers: List[int] = [pair[0] for pair in pairs.items() if len(pair[1]) == 1]
+
+    if len(edge_numbers) > 2:
+        return False
+
+    if edge_numbers:
+        print(f"\t[N = {N}] Edge numbers found! {edge_numbers}")
+        # Solutions are symmetrical, so let's arbitrarily choose a starting number:
         solution = []
-        solution = solve(number, pairs, solution, N)
+        solution = solve(edge_numbers[0], pairs, solution, N)
         if solution:
             print(f"N = {N}, solution = {solution}")
             return solution
+    else:
+        for number in pairs:
+            solution = []
+            solution = solve(number, pairs, solution, N)
+            if solution:
+                print(f"N = {N}, solution = {solution}")
+                return solution
 
     return False
-
-#     ##### Premature optimisation is the root of all evil.  #####
-#     # If a number only has one complementary number, it has to be at the beginning or end
-#     # of the returned sequence. Hence, there cannot be more than two such numbers:
-#     edge_numbers: List[int] = [pair[0] for pair in pairs.items() if len(pair[1]) == 1]
-#
-#     if len(edge_numbers) > 2:
-#         return False
-#
-#     # if edge_numbers:
-#     #     solution = [0 for _ in range(N)]
-#     #     # Solutions are symmetrical, so let's arbitrarily choose a starting number:
-#     #     solution[0] = edge_numbers[0]
-#     #     solution[1] = pairs[solution[0]][0]
-#     #     # ...while the other one goes at the end of the solution (if it exists!!!):
-#     #     solution[-1] = edge_numbers[1]
-#     #     solution[-2] = pairs[solution[-1]][0]
-#     # else:
-#     #     solution = []
-#
-#     solution = []
-#     if edge_numbers:
-#         # Solutions are symmetrical, so let's arbitrarily choose a starting number:
-#         candidate = edge_numbers[0]
-#         # TODO: how about the other edge number? Put it at the end? Save it for later:
-#         last_number = (edge_numbers[1], pairs.pop(edge_numbers[1]))
-#         edge_numbers = []
-#     else:
-#         # No clue, so we may just as well start from the beginning:
-#         # TODO: try other candidates in case this one fails!
-#         candidate = pairs[1][0]
-#
-#     solution.append(candidate)
-#     candidates = pairs[solution[-1]]
-#     pairs.pop(solution[-1])
-#
-#     if len(candidates) == 1:
-#         # easy-peasy
-#         solution.append(candidates[0])
-#         next_candidates = pairs[solution[-1]]
-#         pairs.pop(solution[-1])
-#     else:
-#         for val, candidates in pairs.items():
-#             pairs[val] = [c for c in candidates if c != solution[-1]]
-#             if len(pairs[val]) == 1:
-#                 edge_numbers.append(val)
 
 
 def solution_is_correct(number: int, solution: Union[List[int], bool]) -> bool:
@@ -145,27 +117,35 @@ if __name__ == "__main__":
     for N in range(5, 15):
         assert square_sums(N) is False
 
-    for N in range(15, 18):
-        # N = 15, solution = [8, 1, 15, 10, 6, 3, 13, 12, 4, 5, 11, 14, 2, 7, 9]
-        # N = 16, solution = [8, 1, 15, 10, 6, 3, 13, 12, 4, 5, 11, 14, 2, 7, 9, 16]
-        # N = 17, solution = [16, 9, 7, 2, 14, 11, 5, 4, 12, 13, 3, 6, 10, 15, 1, 8, 17]
-        assert solution_is_correct(N, square_sums(N))
-
     for N in set(range(18 - 25)) - {23}:
         assert square_sums(N) is False  # no solution
 
+    # N = 15, solution = [8, 1, 15, 10, 6, 3, 13, 12, 4, 5, 11, 14, 2, 7, 9]
+    # N = 16, solution = [8, 1, 15, 10, 6, 3, 13, 12, 4, 5, 11, 14, 2, 7, 9, 16]
+    # N = 17, solution = [16, 9, 7, 2, 14, 11, 5, 4, 12, 13, 3, 6, 10, 15, 1, 8, 17]
     # N = 23, solution = [2, 23, 13, 12, 4, 21, 15, 10, 6, 19, 17, 8, 1, 3, 22, 14, 11,
     #   5, 20, 16, 9, 7, 18]
-    assert solution_is_correct(23, square_sums(23))
     # N = 30, solution = [1, 24, 25, 11, 5, 4, 12, 13, 3, 6, 30, 19, 17, 8, 28, 21, 15,
     #   10, 26, 23, 2, 14, 22, 27, 9, 16, 20, 29, 7, 18]
-    assert solution_is_correct(30, square_sums(30))
     # N = 31, solution = [1, 15, 10, 6, 30, 19, 17, 8, 28, 21, 4, 5, 31, 18, 7, 29, 20,
     #   16, 9, 27, 22, 3, 13, 12, 24, 25, 11, 14, 2, 23, 26]
-    assert solution_is_correct(31, square_sums(31))
-
-    start = time.perf_counter()
     # N = 37, solution = [1, 3, 13, 36, 28, 8, 17, 32, 4, 21, 15, 34, 30, 19, 6, 10, 26,
     #     23, 2, 7, 18, 31, 33, 16, 9, 27, 22, 14, 35, 29, 20, 5, 11, 25, 24, 12, 37]
-    assert solution_is_correct(37, square_sums(37))
-    print(time.perf_counter() - start)  # ~ 0.77-1.4...
+
+    for N in [15, 16, 17, 23, 30, 31, 37]:
+        start = time.perf_counter()
+        assert solution_is_correct(N, square_sums(N))
+        print(f"[N = {N}] {time.perf_counter() - start}")  # ~ 0.77-1.4 s for N=37
+
+    # N = 48, solution = [1, 3, 6, 10, 15, 21, 4, 32, 17, 47, 2, 34, 30, 19, 45, 36, 28,
+    #   8, 41, 40, 9, 7, 29, 20, 16, 48, 33, 31, 18, 46, 35, 14, 11, 5, 44, 37, 27, 22,
+    #   42, 39, 25, 24, 12, 13, 23, 26, 38, 43], took >40 seconds
+    # N = 49, ...
+    # N = 50, solution = [1, 3, 6, 10, 15, 21, 43, 38, 26, 23, 2, 7, 18, 46, 35, 29, 20,
+    #   44, 37, 12, 13, 36, 28, 8, 41, 40, 24, 25, 39, 42, 22, 27, 9, 16, 48, 33, 31, 50,
+    #   14, 11, 5, 4, 45, 19, 30, 34, 47, 17, 32, 49], still it took almost 7 minutes :D
+    
+    # for N in range(38, 51):
+    #     start = time.perf_counter()
+    #     assert solution_is_correct(N, square_sums(N))
+    #     print(f"[N = {N}] {time.perf_counter() - start}")
