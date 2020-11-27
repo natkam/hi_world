@@ -16,7 +16,7 @@ def run_with_lock(
     There's also a possibility to force two different decorated coroutines to
     use the same lock, by passing the lock object as the decorator argument.
 
-    IMPORTANT: The decorated coroutine cannot be ran with `asyncio.run`!
+    IMPORTANT: The decorated coroutine cannot be run with `asyncio.run`!
     `asyncio.run` creates a new event loop, and it will raise a RuntimeError.
     Use `asyncio.get_event_loop().run_until_complete` instead.
     """
